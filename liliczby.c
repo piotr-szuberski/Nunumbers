@@ -8,28 +8,28 @@
 
 #define Y 1
 #define Z 0
-#define MNIEJSZA -1
+#define MNIEJSZA (-1)
 #define WIEKSZA 1
 #define ROWNE 0
 
 struct liliczba {
-    int wart;
-    struct liliczba *wykl;
+    int wartosc;
+    struct liliczba *wykladnik;
     struct liliczba *bok;
 };
 typedef struct liliczba Tliliczba;
 
 /*Funkcja nr 1: wczytuje jedną liliczbę */
-Tliliczba *wczytanie(void) {
+Tliliczba *wczytanie() {
     int x;
     Tliliczba *l = malloc(sizeof *l);
     x = getchar();
-    if(x == 'Z') {
-        l->wart = Z;
-        l->bok = l->wykl = NULL;
+    if (x == 'Z') {
+        l->wartosc = Z;
+        l->bok = l->wykladnik = NULL;
     } else {
-        l->wart = Y;
-        l->wykl = wczytanie();
+        l->wartosc = Y;
+        l->wykladnik = wczytanie();
         l->bok = wczytanie();
     }
     return l;
@@ -37,21 +37,21 @@ Tliliczba *wczytanie(void) {
 
 /* Funkcja nr 2: wypisuje liliczbę na wyjście */
 void pisz(Tliliczba *l) {
-    if(l->wart == Z)
+    if (l->wartosc == Z)
         printf("Z");
     else {
         printf("Y");
-        pisz(l->wykl);
+        pisz(l->wykladnik);
         pisz(l->bok);
     }
 }
 
 /* Funkcja nr 3: kasuje liliczbę, uwalniając zaalokowane miejsce */
 void usun_liczbe(Tliliczba *x) {
-    if(x->wart == Z) {
+    if (x->wartosc == Z) {
         free(x);
     } else {
-        usun_liczbe(x->wykl);
+        usun_liczbe(x->wykladnik);
         usun_liczbe(x->bok);
         free(x);
     }
@@ -59,10 +59,10 @@ void usun_liczbe(Tliliczba *x) {
 
 /* Funkcja nr 4: kasuje segment liliczby */
 void usun_segment(Tliliczba *x) {
-    if(x->wart == Z)
+    if (x->wartosc == Z)
         free(x);
     else {
-        usun_liczbe(x->wykl);
+        usun_liczbe(x->wykladnik);
         free(x);
     }
 }
@@ -70,26 +70,27 @@ void usun_segment(Tliliczba *x) {
 /* Funkcja nr 4: porównuje ze sobą dwie liliczby */
 int porownaj_liczbe(Tliliczba *a, Tliliczba *b) {
     int porownanie;
-    if(a->wart == Z && b->wart == Z) {
+
+    if (a->wartosc == Z && b->wartosc == Z) {
         porownanie = ROWNE;
-    } else { if(a->wart == Z) {
+    } else if (a->wartosc == Z) {
         porownanie = MNIEJSZA;
-    } else { if(b->wart == Z) {
+    } else if (b->wartosc == Z) {
         porownanie = WIEKSZA;
     } else {
-        porownanie = porownaj_liczbe(a->wykl, b->wykl);
-        if(porownanie == ROWNE) {
+        porownanie = porownaj_liczbe(a->wykladnik, b->wykladnik);
+        if (porownanie == ROWNE) {
             porownanie = porownaj_liczbe(a->bok, b->bok);
-        } else { if(porownanie == MNIEJSZA) {
+        } else if (porownanie == MNIEJSZA) {
             porownanie = porownaj_liczbe(a->bok, b);
-            if(porownanie == ROWNE)
+            if (porownanie == ROWNE)
                 porownanie = WIEKSZA;
-        } else { if(porownanie == WIEKSZA) {
+        } else if (porownanie == WIEKSZA) {
             porownanie = porownaj_liczbe(a, b->bok);
-            if(porownanie == ROWNE)
+            if (porownanie == ROWNE)
                 porownanie = MNIEJSZA;
-        }}}
-    }}}
+        }
+    }
     return porownanie;
 }
 
@@ -98,39 +99,41 @@ int porownaj_liczbe(Tliliczba *a, Tliliczba *b) {
 */
 int porownaj_segment(Tliliczba *a, Tliliczba *b) {
     int porownanie;
-    if(a->wart == Z && b->wart == Z) {
+
+    if (a->wartosc == Z && b->wartosc == Z)
         porownanie = ROWNE;
-    } else { if(a->wart == Z) {
+    else if (a->wartosc == Z)
         porownanie = MNIEJSZA;
-    } else { if(b->wart == Z) {
+    else if (b->wartosc == Z)
         porownanie = WIEKSZA;
-    } else {
-        porownanie = porownaj_liczbe(a->wykl, b->wykl);
-    }}}
+    else
+        porownanie = porownaj_liczbe(a->wykladnik, b->wykladnik);
+
     return porownanie;
 }
 
 /* Funkcja nr 6: dodaje wartość 1 do liliczby */
 void dodaj_jeden(Tliliczba *x) {
     Tliliczba *nowy1, *nowy2;
-    while(x->wart != Z) {
+
+    while (x->wartosc != Z)
         x = x->bok;
-    }
-    nowy1 = malloc(sizeof*nowy1);
-    nowy2 = malloc(sizeof*nowy2);
-    nowy2->wykl = nowy2->bok = nowy1->wykl = nowy1->bok = NULL;
-    nowy2->wart = nowy1->wart = Z;
-    x->wart = Y;
-    x->wykl = nowy1;
+
+    nowy1 = malloc(sizeof *nowy1);
+    nowy2 = malloc(sizeof *nowy2);
+    nowy2->wykladnik = nowy2->bok = nowy1->wykladnik = nowy1->bok = NULL;
+    nowy2->wartosc = nowy1->wartosc = Z;
+    x->wartosc = Y;
+    x->wykladnik = nowy1;
     x->bok = nowy2;
 }
 
 /* Funkcja nr 7: zamienia wykładniki liliczb */
 void zamien(Tliliczba *a, Tliliczba *b) {
     Tliliczba *tmp;
-    tmp = a->wykl;
-    a->wykl = b->wykl;
-    b->wykl = tmp;
+    tmp = a->wykladnik;
+    a->wykladnik = b->wykladnik;
+    b->wykladnik = tmp;
 }
 
 /* Funkcja nr 8: normalizująca liliczby.
@@ -144,25 +147,27 @@ void zamien(Tliliczba *a, Tliliczba *b) {
 void *normalizacja(Tliliczba *a) {
     int x;
     Tliliczba *tmp;
-    if(a->wart == Z) {
+
+    if (a->wartosc == Z)
         return a;
-    }
-    normalizacja(a->wykl);
+
+    normalizacja(a->wykladnik);
     do {
         normalizacja(a->bok);
-        if (a->bok->wart == Z)
+
+        if (a->bok->wartosc == Z)
             x = MNIEJSZA;
-        else {
+        else
             x = porownaj_segment(a, a->bok);
-        }
-        if(x == ROWNE) {
+
+        if (x == ROWNE) {
             tmp = a->bok;
             a->bok = tmp->bok;
             tmp->bok = NULL;
             usun_segment(tmp);
-            dodaj_jeden(a->wykl);
+            dodaj_jeden(a->wykladnik);
             normalizacja(a);
-        } else if(x == WIEKSZA) {
+        } else if (x == WIEKSZA) {
             zamien(a, a->bok);
         }
     } while (x == WIEKSZA);
@@ -173,16 +178,17 @@ void *normalizacja(Tliliczba *a) {
    liliczb i kasuje Z jednej z nich, następnie je normalizuje */
 Tliliczba *dodawanie(Tliliczba *a, Tliliczba *b) {
     Tliliczba *suma, *koniec, *poprz;
-    if(a->wart == Z) {
+    if (a->wartosc == Z) {
         free(a);
         return b;
-    } else { if(b->wart == Z) {
+    } else if (b->wartosc == Z) {
+
         free(b);
         return a;
     } else {
         poprz = a;
         koniec = a->bok;
-        while(koniec->wart != Z) {
+        while (koniec->wartosc != Z) {
             koniec = koniec->bok;
             poprz = poprz->bok;
         }
@@ -191,19 +197,20 @@ Tliliczba *dodawanie(Tliliczba *a, Tliliczba *b) {
         poprz->bok = b;
         normalizacja(suma);
         return suma;
-    }}
+    }
+
 }
 
 /* Funkcja nr 10: kopiuje liliczbę, alokując nowe miejsca w pamięci */
 Tliliczba *kopiuj(Tliliczba *x) {
     Tliliczba *kopia;
-    kopia = (Tliliczba*)malloc(sizeof*kopia);
-    if(x->wart == Z) {
-        kopia->wart = Z;
-        kopia->wykl = kopia->bok = NULL;
+    kopia = (Tliliczba *) malloc(sizeof *kopia);
+    if (x->wartosc == Z) {
+        kopia->wartosc = Z;
+        kopia->wykladnik = kopia->bok = NULL;
     } else {
-        kopia->wart = Y;
-        kopia->wykl = kopiuj(x->wykl);
+        kopia->wartosc = Y;
+        kopia->wykladnik = kopiuj(x->wykladnik);
         kopia->bok = kopiuj(x->bok);
     }
     return kopia;
@@ -219,31 +226,31 @@ Tliliczba *kopiuj(Tliliczba *x) {
 Tliliczba *mnozenie(Tliliczba *a, Tliliczba *b) {
     Tliliczba *tmpb, *tmpa, *poma, *pomb;
     Tliliczba *iloczyn, *poczatek, *nowy1, *nowy2;
-    iloczyn = malloc(sizeof*iloczyn);
+    iloczyn = malloc(sizeof *iloczyn);
     poczatek = iloczyn;
-    if(a->wart == Z || b->wart == Z) {
-        iloczyn->wart = Z;
-        iloczyn->bok = iloczyn->wykl = NULL;
+    if (a->wartosc == Z || b->wartosc == Z) {
+        iloczyn->wartosc = Z;
+        iloczyn->bok = iloczyn->wykladnik = NULL;
     } else {
-        iloczyn->wart = Y;
+        iloczyn->wartosc = Y;
         poma = a;
-        while(poma->wart != Z) {
+        while (poma->wartosc != Z) {
             pomb = b;
-            while(pomb->wart != Z) {
-                nowy2 = malloc(sizeof*nowy2);
-                tmpa = kopiuj(poma->wykl);
-                tmpb = kopiuj(pomb->wykl);
+            while (pomb->wartosc != Z) {
+                nowy2 = malloc(sizeof *nowy2);
+                tmpa = kopiuj(poma->wykladnik);
+                tmpb = kopiuj(pomb->wykladnik);
                 nowy1 = dodawanie(tmpa, tmpb);
-                nowy2->wart = Y;
-                iloczyn->wykl = nowy1;
+                nowy2->wartosc = Y;
+                iloczyn->wykladnik = nowy1;
                 iloczyn->bok = nowy2;
                 iloczyn = iloczyn->bok;
                 pomb = pomb->bok;
             }
             poma = poma->bok;
         }
-        iloczyn->wart = Z;
-        iloczyn->bok = iloczyn->wykl = NULL;
+        iloczyn->wartosc = Z;
+        iloczyn->bok = iloczyn->wykladnik = NULL;
     }
     iloczyn = poczatek;
     normalizacja(iloczyn);

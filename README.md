@@ -1,2 +1,2 @@
 # Nunumbers
-My 3rd project on the 1st semester of studies
+My 3rd project in C on the 1st semester of studies
